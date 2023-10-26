@@ -106,15 +106,7 @@ CameraDeviceClient::CameraDeviceClient(const sp<CameraService>& cameraService,
     mInputStream(),
     mStreamingRequestId(REQUEST_ID_NONE),
     mRequestIdCounter(0),
-    mPrivilegedClient(false),
     mOverrideForPerfClass(overrideForPerfClass) {
-
-    char value[PROPERTY_VALUE_MAX];
-    property_get("persist.vendor.camera.privapp.list", value, "");
-    String16 packagelist(value);
-    if (packagelist.contains(clientPackageName.string())) {
-        mPrivilegedClient = true;
-    }
 
     ATRACE_CALL();
     ALOGI("CameraDeviceClient %s: Opened", cameraId.string());
@@ -941,7 +933,7 @@ binder::Status CameraDeviceClient::createStream(
         res = SessionConfigurationUtils::createSurfaceFromGbp(streamInfo,
                 isStreamInfoValid, surface, bufferProducer, mCameraIdStr,
                 mDevice->infoPhysical(physicalCameraId), sensorPixelModesUsed, dynamicRangeProfile,
-                streamUseCase, timestampBase, mirrorMode, colorSpace, mPrivilegedClient);
+                streamUseCase, timestampBase, mirrorMode, colorSpace);
 
         if (!res.isOk())
             return res;
@@ -1314,7 +1306,7 @@ binder::Status CameraDeviceClient::updateOutputConfiguration(int streamId,
         res = SessionConfigurationUtils::createSurfaceFromGbp(outInfo,
                 /*isStreamInfoValid*/ false, surface, newOutputsMap.valueAt(i), mCameraIdStr,
                 mDevice->infoPhysical(physicalCameraId), sensorPixelModesUsed, dynamicRangeProfile,
-                streamUseCase, timestampBase, mirrorMode, colorSpace, mPrivilegedClient);
+                streamUseCase, timestampBase, mirrorMode, colorSpace);
         if (!res.isOk())
             return res;
 
@@ -1689,7 +1681,7 @@ binder::Status CameraDeviceClient::finalizeOutputConfigurations(int32_t streamId
         res = SessionConfigurationUtils::createSurfaceFromGbp(mStreamInfoMap[streamId],
                 true /*isStreamInfoValid*/, surface, bufferProducer, mCameraIdStr,
                 mDevice->infoPhysical(physicalId), sensorPixelModesUsed, dynamicRangeProfile,
-                streamUseCase, timestampBase, mirrorMode, colorSpace, mPrivilegedClient);
+                streamUseCase, timestampBase, mirrorMode, colorSpace);
 
         if (!res.isOk())
             return res;
